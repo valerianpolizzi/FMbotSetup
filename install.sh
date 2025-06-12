@@ -20,5 +20,9 @@ fi
 echo "📥 Téléchargement du binaire '$BINARY' depuis $REPO"
 gh release download --repo "$REPO" --pattern "$BINARY" --clobber
 
+sudo apt install -y nodejs npm
+
+sudo npm install -g pm2
+
 chmod +x "$BINARY"
 echo "✅ Téléchargement terminé"
