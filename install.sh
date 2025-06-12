@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REPO="https://github.com/valerianpolizzi/FMbot"
-BINARY="fm-bot"
+BINARY="fm-bot-ubuntu"
 
 # Fonction exécutée à la fin du script ou en cas de Ctrl+C
 cleanup() {
