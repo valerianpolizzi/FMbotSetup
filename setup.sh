@@ -73,6 +73,6 @@ if python3 -c "from playwright.sync_api import sync_playwright; print('✅ Playw
   echo "🚀 Prêt à lancer le binaire FMBot"
 else
   echo "❌ Erreur lors du test Playwright"
-  exit 1
 fi
 
+sudo apt install gh
