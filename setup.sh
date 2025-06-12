@@ -3,38 +3,38 @@
 # install-deps.sh
 # À exécuter AVANT de lancer le binaire PyInstaller
 
-set -e  # Stoppe le script à la moindre erreur
+set -e
 
 echo "🔧 Installation des dépendances pour FMBot (binaire PyInstaller)"
 echo "=============================================================="
 
-# 🔍 Vérification et installation de Python + pip + venv
+# 🔍 Installation des paquets système requis
 sudo apt update
 sudo apt install -y python3 python3-pip python3-venv
 
-# 🐍 Vérifie que Python est dispo
-if ! command -v python3 &> /dev/null; then
-    echo "❌ Python 3 est requis mais non trouvé"
-    echo "💡 Tentez : sudo apt install python3 python3-pip"
-    exit 1
+# 🐍 Vérifie la présence de Python 3
+if ! command -v python3 &>/dev/null; then
+  echo "❌ Python 3 requis mais introuvable"
+  exit 1
 fi
 
 echo "✅ Python $(python3 --version) détecté"
 
-# 📁 Création d'un environnement virtuel si nécessaire
+# 📁 Création de l’environnement virtuel
 if [[ ! -d .venv ]]; then
-    echo "📦 Création de l'environnement virtuel (.venv)"
-    python3 -m venv .venv
-else
-    echo "✅ Environnement virtuel déjà présent"
+  echo "📦 Création de l’environnement virtuel .venv"
+  python3 -m venv .venv
 fi
 
-# ✅ Activation de l'environnement virtuel
+# ✅ Activation
 source .venv/bin/activate
 
-# 📜 Installation des dépendances Python
-echo "📥 Installation des dépendances..."
-pip install --upgrade pip
+# 📥 Mise à jour de pip dans l’environnement virtuel uniquement
+echo "📦 Mise à jour locale de pip..."
+python -m pip install --upgrade pip
+
+# 📜 Installation des dépendances
+echo "📥 Installation des dépendances Python..."
 pip install \
   greenlet==3.2.2 \
   playwright==1.52.0 \
@@ -50,30 +50,29 @@ esac
 
 # 🔍 Vérification si navigateurs déjà installés
 if [[ -d "$BROWSERS_PATH" ]] && find "$BROWSERS_PATH" -name "chromium-*" -o -name "firefox-*" | grep -q .; then
-    echo "✅ Navigateurs Playwright déjà présents dans : $BROWSERS_PATH"
-    echo "🎉 Votre binaire FMBot est prêt à fonctionner !"
-    exit 0
+  echo "✅ Navigateurs Playwright déjà présents"
+  echo "🎉 FMBot prêt à fonctionner !"
+  deactivate
+  exit 0
 fi
 
-echo "❌ Navigateurs Playwright non trouvés, installation..."
-
-# 🧱 Installation des navigateurs via Playwright
-echo "📦 Installation de Playwright et des navigateurs..."
+# 🌐 Installation des navigateurs
+echo "🌐 Installation des navigateurs Playwright..."
 playwright install
 
-# 🔧 Dépendances système (Linux uniquement)
-if [[ "$OS" == "linux" ]] && command -v apt &> /dev/null; then
-    echo "🔧 Installation des dépendances système Playwright (Linux)"
-    playwright install-deps
+# 🔧 Dépendances Linux (si nécessaire)
+if [[ "$OS" == "linux" ]] && command -v apt &>/dev/null; then
+  echo "🔧 Installation des dépendances système Playwright (Linux)"
+  playwright install-deps
 fi
 
 # ✅ Vérification finale
-echo "🔍 Vérification finale de Playwright..."
+echo "🔍 Vérification finale de l’installation..."
 if python3 -c "from playwright.sync_api import sync_playwright; print('✅ Playwright OK')" &>/dev/null; then
-    echo "🎉 Installation terminée avec succès !"
-    echo "📍 Navigateurs installés dans : $BROWSERS_PATH"
-    echo "🚀 Vous pouvez maintenant lancer votre binaire FMBot"
+  echo "🎉 Installation réussie ! Navigateurs dans : $BROWSERS_PATH"
+  echo "🚀 Prêt à lancer le binaire FMBot"
 else
-    echo "❌ Test de Playwright échoué"
-    exit 1
+  echo "❌ Erreur lors du test Playwright"
+  exit 1
 fi
+
